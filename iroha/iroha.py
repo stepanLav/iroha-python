@@ -4,7 +4,8 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-from . import ed25519
+from . import ed25519 as ed25519_sha3
+import nacl.signing as ed25519_sha2
 import hashlib
 import binascii
 import grpc
@@ -24,7 +25,6 @@ class IrohaCrypto(object):
     """
     Collection of general crypto-related functions
     """
-
     @staticmethod
     def derive_public_key(private_key):
         """
@@ -32,10 +32,27 @@ class IrohaCrypto(object):
         :param private_key: hex encoded private key
         :return: hex encoded public key
         """
-        secret = binascii.unhexlify(private_key)
-        public_key = ed25519.publickey_unsafe(secret)
-        hex_public_key = binascii.hexlify(public_key)
-        return hex_public_key
+        if isinstance(private_key, str):  # default, legacy
+            secret = binascii.unhexlify(private_key)
+            public_key = ed25519_sha3.publickey_unsafe(secret)
+            hex_public_key = binascii.hexlify(public_key)
+            return hex_public_key
+        elif isinstance(private_key, ed25519_sha2.SigningKey):
+            return 'ed0120' + binascii.hexlify(private_key.verify_key.encode())
+
+    @staticmethod
+    def get_payload_to_be_signed(proto):
+        """
+        :proto: proto transaction or query
+        :return: bytes representation of what has to be signed
+        """
+        if hasattr(proto, 'payload'):
+            return proto.payload.SerializeToString()
+        # signing of meta is implemented for block streaming queries,
+        # because they do not have a payload in their schema
+        elif hasattr(proto, 'meta'):
+            return proto.meta.SerializeToString()
+        raise RuntimeError('Unknown message type.')
 
     @staticmethod
     def hash(proto_with_payload):
@@ -44,16 +61,8 @@ class IrohaCrypto(object):
         :proto_with_payload: proto transaction or query
         :return: bytes representation of hash
         """
-        obj = None
-        if hasattr(proto_with_payload, 'payload'):
-            obj = getattr(proto_with_payload, 'payload')
-        # hash of meta is implemented for block streaming queries,
-        # because they do not have a payload in their schema
-        elif hasattr(proto_with_payload, 'meta'):
-            obj = getattr(proto_with_payload, 'meta')
-
-        bytes = obj.SerializeToString()
-        hash = hashlib.sha3_256(bytes).digest()
+        obj = IrohaCrypto.get_payload_to_be_signed(proto_with_payload)
+        hash = hashlib.sha3_256(obj).digest()
         return hash
 
     @staticmethod
@@ -65,10 +74,17 @@ class IrohaCrypto(object):
         :return: a proto Signature message
         """
         public_key = IrohaCrypto.derive_public_key(private_key)
-        sk = binascii.unhexlify(private_key)
-        pk = binascii.unhexlify(public_key)
-        message_hash = IrohaCrypto.hash(message)
-        signature_bytes = ed25519.signature_unsafe(message_hash, sk, pk)
+        if isinstance(private_key, str):  # default, legacy
+            message_hash = IrohaCrypto.hash(message)
+            sk = binascii.unhexlify(private_key)
+            pk = binascii.unhexlify(public_key)
+            signature_bytes = ed25519_sha3.signature_unsafe(
+                message_hash, sk, pk)
+        elif isinstance(private_key, ed25519_sha2.SigningKey):
+            signature_bytes = private_key.sign(
+                IrohaCrypto.get_payload_to_be_signed(message)).signature
+        else:
+            raise RuntimeError('Unsupported private key type.')
         signature = primitive_pb2.Signature()
         signature.public_key = public_key
         signature.signature = binascii.hexlify(signature_bytes)
@@ -134,7 +150,7 @@ class IrohaCrypto(object):
     @staticmethod
     def private_key():
         """
-        Generates new random private key
+        Generates new random ed25519/sha3 private key
         :return: hex representation of private key
         """
         return binascii.b2a_hex(os.urandom(32))
