@@ -14,8 +14,8 @@ if sys.version_info[0] < 3:
 
 IROHA_HOST_ADDR = os.getenv('IROHA_HOST_ADDR', 'localhost')
 IROHA_PORT = os.getenv('IROHA_PORT', '2345')
-ADMIN_ACCOUNT_ID = 'alice@test'
-ADMIN_PRIVATE_KEY = '51cec58ded55857ff908d4f205abe940aa5f20786753ec60ad56ed0db3d27048'
+ADMIN_ACCOUNT_ID = 'superuser@sora'
+ADMIN_PRIVATE_KEY = '3B102A3F22A24EA1F3C9CCB0A237EC268955F099154F92CEC20B0474690AC58C'
 iroha = Iroha(ADMIN_ACCOUNT_ID)
 net = IrohaGrpc('{}:{}'.format(IROHA_HOST_ADDR, IROHA_PORT))
 hex_hash = ''
@@ -50,7 +50,7 @@ def send_transaction_and_print_status(transaction):
 def create_account():
 
     tx = iroha.transaction([
-        iroha.command('CreateAccount', account_name="admin", domain_id="test", public_key="716fe505f69f18511a1b083915aa9ff73ef36e6688199f3959750db38b8f4bfc")
+        iroha.command('CreateAccount', account_name="project", domain_id="sora", public_key="41a5567718527c10f4b7473c317a816051db194acd77e95bd329432962db4afe")
     ], creator_account=ADMIN_ACCOUNT_ID, quorum=1)
 
     IrohaCrypto.sign_transaction(tx, ADMIN_PRIVATE_KEY)

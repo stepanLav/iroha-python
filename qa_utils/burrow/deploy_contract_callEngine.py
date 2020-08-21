@@ -155,12 +155,12 @@ def call_engine():
 
 @trace
 def getEngineReceipts():
-    query = iroha.query('GetEngineReceipts', tx_hash="ba5d93d336c0f0b93d806617eac97e85b2c5f547b4a5020421ab6dfe00380377")
+    query = iroha.query('GetEngineReceipts', tx_hash="346d327f2210e5b4da1e8c3b083b8864a719e76f0ad1e92903272e53a6ab9689".upper())
     IrohaCrypto.sign_query(query, ADMIN_PRIVATE_KEY)
     response = net.send_query(query)
     print(response)
 
 
-call_engine()
+#call_engine()
 getEngineReceipts()
 print('done')

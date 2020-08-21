@@ -99,13 +99,14 @@ message SubtractAssetQuantity {
     string amount = 2;
 }
 
-message CompareAndSetAccountDetail {
+message CompareAndSetAccountDetail{
     string account_id = 1;
     string key = 2;
     string value = 3;
     oneof opt_old_value {
         string old_value = 4;
     }
+    bool check_empty = 5;
 }
 
 message SetSettingValue {

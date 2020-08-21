@@ -1,12 +1,13 @@
-#!/usr/bin/env python3
-#
 
 import os
 import binascii
-from iroha import IrohaCrypto
+from iroha import IrohaCrypto, queries_pb2
 from iroha import Iroha, IrohaGrpc
-from iroha.primitive_pb2 import can_set_my_account_detail
 import sys
+
+if sys.version_info[0] < 3:
+    raise Exception('Python 3 or a more recent version is required.')
+
 
 IROHA_HOST_ADDR = os.getenv('IROHA_HOST_ADDR', 'localhost')
 IROHA_PORT = os.getenv('IROHA_PORT', '2345')
@@ -14,13 +15,12 @@ ADMIN_ACCOUNT_ID = 'admin@root'
 ADMIN_PRIVATE_KEY = 'de9d622f92efe4a6e9a3926024b2a4543462233db0bfabcaf8eb6933e6c81466'
 iroha = Iroha(ADMIN_ACCOUNT_ID)
 net = IrohaGrpc('{}:{}'.format(IROHA_HOST_ADDR, IROHA_PORT))
-
+txs = ['b2725674be478b64c3a59de529a19d7313f0de2d7ae8ca484e4d3462777d458d'.upper()]
 
 def trace(func):
     """
     A decorator for tracing methods' begin/end execution points
     """
-
     def tracer(*args, **kwargs):
         name = func.__name__
         print('\tEntering "{}"'.format(name))
@@ -32,21 +32,24 @@ def trace(func):
 
 
 @trace
-def send_transaction(transaction):
+def send_transaction_and_print_status(transaction):
+    global hex_hash
     hex_hash = binascii.hexlify(IrohaCrypto.hash(transaction))
     print('Transaction hash = {}, creator = {}'.format(
         hex_hash, transaction.payload.reduced_payload.creator_account_id))
     net.send_tx(transaction)
+    for status in net.tx_status_stream(transaction):
+        print(status)
+
 
 @trace
-def add_asset_quantity():
+def get_account():
+    query = IrohaCrypto.sign_query(
+        Iroha(ADMIN_ACCOUNT_ID).query('GetAccountTransactions', account_id=ADMIN_ACCOUNT_ID, page_size=1, first_tx_hash='8fed3bf66021dc29daeb45dbe7f08a3d9d1d5d4cca39643a93a3b0e7882eb160'.lower()), ADMIN_PRIVATE_KEY
+    )
+    IrohaCrypto.sign_query(query, ADMIN_PRIVATE_KEY)
+    response = net.send_query(query)
+    print(response)
 
-    tx = iroha.transaction([
-        iroha.command('AddAssetQuantity',
-                      asset_id='coin#test', amount='1000000.00')
-    ])
 
-    IrohaCrypto.sign_transaction(tx, ADMIN_PRIVATE_KEY)
-    send_transaction(tx)
-
-add_asset_quantity()
+get_account()

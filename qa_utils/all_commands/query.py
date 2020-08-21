@@ -51,10 +51,10 @@ def send_transaction_and_print_status(transaction):
 @trace
 def get_account_assets():
 
-        query = iroha.query('GetAccountAssets', account_id=ADMIN_ACCOUNT_ID)
+        query = iroha.query('GetAccountAssetTransactions', account_id=ADMIN_ACCOUNT_ID)
         IrohaCrypto.sign_query(query, ADMIN_PRIVATE_KEY)
 
-        response = net.send_query(query)
+        response = net.send_blocks_stream_query(query)
         data = response.account_assets_response.account_assets
         for asset in data:
             print('Asset id = {}, balance = {}'.format(
