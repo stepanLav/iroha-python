@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 #
+# Copyright Soramitsu Co., Ltd. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
 
 import os
 import binascii
@@ -18,7 +21,10 @@ ADMIN_ACCOUNT_ID = 'admin@test'
 ADMIN_PRIVATE_KEY = 'f101537e319568c765b2cc89698325604991dca57b9716b58016b253506cab70'
 iroha = Iroha(ADMIN_ACCOUNT_ID)
 net = IrohaGrpc('{}:{}'.format(IROHA_HOST_ADDR, IROHA_PORT))
-hex_hash = ''
+txs = [
+    'f101537e319568c765b2cc89698325604991dca57b9716b58016b253506caba1',
+    'f101537e319568c765b2cc89698325604991dca57b9716b58016b253506caba2'
+]
 
 def trace(func):
     """
@@ -36,25 +42,19 @@ def trace(func):
 
 
 @trace
-def send_transaction_and_print_status(transaction):
-    global hex_hash
-    hex_hash = binascii.hexlify(IrohaCrypto.hash(transaction))
-    print('Transaction hash = {}, creator = {}'.format(
-        hex_hash, transaction.payload.reduced_payload.creator_account_id))
-    net.send_tx(transaction)
-    for status in net.tx_status_stream(transaction):
-        print(status)
+def get_txs():
+
+        query = iroha.query('GetTransactions', tx_hashes=txs)
+        IrohaCrypto.sign_query(query, ADMIN_PRIVATE_KEY)
+
+        response = net.send_query(query)
+        data = response.account_assets_response.account_assets
+        if response.error_response:
+            print(response.error_response)
+        for asset in data:
+            print('Asset id = {}, balance = {}'.format(
+                asset.asset_id, asset.balance))
 
 
-@trace
-def create_asset():
-    commands = [
-        iroha.command('CreateAsset', asset_name='coin',
-                      domain_id='test', precision=2)
-    ]
-    tx = IrohaCrypto.sign_transaction(
-        iroha.transaction(commands), ADMIN_PRIVATE_KEY)
-    send_transaction_and_print_status(tx)
-
-
-create_asset()
+get_txs()
+print('done')

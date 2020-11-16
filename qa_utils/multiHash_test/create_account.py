@@ -9,11 +9,11 @@ import sys
 if sys.version_info[0] < 3:
     raise Exception('Python 3 or a more recent version is required.')
 
-IROHA_HOST_ADDR = os.getenv('IROHA_HOST_ADDR', 's1.tst2.iroha.tech')
+IROHA_HOST_ADDR = os.getenv('IROHA_HOST_ADDR', 'localhost')
 IROHA_PORT = os.getenv('IROHA_PORT', '50051')
 ADMIN_ACCOUNT_ID = os.getenv('ADMIN_ACCOUNT_ID', 'alice@test')
 ADMIN_PRIVATE_KEY = os.getenv(
-    'ADMIN_PRIVATE_KEY', '0a230371f78507d9809a2ba1e349d98cd8022d94fc6f57857f8861c5794f7d39')
+    'ADMIN_PRIVATE_KEY', '51cec58ded55857ff908d4f205abe940aa5f20786753ec60ad56ed0db3d27048')
 
 user_private_key = IrohaCrypto.private_key()
 user_public_key = IrohaCrypto.derive_public_key(user_private_key)

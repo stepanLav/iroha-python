@@ -18,9 +18,9 @@ if sys.version_info[0] < 3:
 
 
 IROHA_HOST_ADDR = os.getenv('IROHA_HOST_ADDR', '127.0.0.1')
-IROHA_PORT = os.getenv('IROHA_PORT', '2345')
-ADMIN_ACCOUNT_ID = 'admin@root'
-ADMIN_PRIVATE_KEY = 'de9d622f92efe4a6e9a3926024b2a4543462233db0bfabcaf8eb6933e6c81466'
+IROHA_PORT = os.getenv('IROHA_PORT', '50051')
+ADMIN_ACCOUNT_ID = 'alice@test'
+ADMIN_PRIVATE_KEY = '51cec58ded55857ff908d4f205abe940aa5f20786753ec60ad56ed0db3d27048'
 iroha = Iroha(ADMIN_ACCOUNT_ID)
 net = IrohaGrpc('{}:{}'.format(IROHA_HOST_ADDR, IROHA_PORT))
 
@@ -54,8 +54,8 @@ def send_transaction_and_print_status(transaction):
 def transfer_coin_from_admin_to_userone():
     tx = iroha.transaction([
         iroha.command('TransferAsset', src_account_id=ADMIN_ACCOUNT_ID,
-                      dest_account_id='alice@test',
-                      asset_id='coin#test', description='You are', amount='1.00')
+                      dest_account_id='bob@test',
+                      asset_id='coin#test', description='Are you have 100 symbols?Are you have 100 symbols?Are you have 100 symbols?', amount='1')
     ])
     IrohaCrypto.sign_transaction(tx, ADMIN_PRIVATE_KEY)
     send_transaction_and_print_status(tx)
@@ -75,8 +75,9 @@ def get_account_assets():
                 asset.asset_id, asset.balance))
 
 i=0
-while i < 1000:
+while i < 1:
     transfer_coin_from_admin_to_userone()
     get_account_assets()
     i += 1
+    sleep(1)
 

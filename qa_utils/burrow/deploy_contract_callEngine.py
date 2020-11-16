@@ -16,9 +16,9 @@ if sys.version_info[0] < 3:
 
 
 IROHA_HOST_ADDR = os.getenv('IROHA_HOST_ADDR', 'localhost')
-IROHA_PORT = os.getenv('IROHA_PORT', '2345')
-ADMIN_ACCOUNT_ID = 'admin@root'
-ADMIN_PRIVATE_KEY = 'de9d622f92efe4a6e9a3926024b2a4543462233db0bfabcaf8eb6933e6c81466'
+IROHA_PORT = os.getenv('IROHA_PORT', '50051')
+ADMIN_ACCOUNT_ID = 'root@root'
+ADMIN_PRIVATE_KEY = '7a1cb487ed17a60efbf4aa21df74bb391fcc2260f87c83eb7de9c120d2112ec7'
 iroha = Iroha(ADMIN_ACCOUNT_ID)
 net = IrohaGrpc('{}:{}'.format(IROHA_HOST_ADDR, IROHA_PORT))
 
@@ -155,12 +155,12 @@ def call_engine():
 
 @trace
 def getEngineReceipts():
-    query = iroha.query('GetEngineReceipts', tx_hash="346d327f2210e5b4da1e8c3b083b8864a719e76f0ad1e92903272e53a6ab9689".upper())
+    query = iroha.query('GetEngineReceipts', tx_hash="48edc171bd7c67ee0a11666298c56f3c3d8ec9a07ab7825e9916930f9cc5e68a".upper())
     IrohaCrypto.sign_query(query, ADMIN_PRIVATE_KEY)
     response = net.send_query(query)
     print(response)
 
 
-#call_engine()
+call_engine()
 getEngineReceipts()
 print('done')

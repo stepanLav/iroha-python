@@ -9,20 +9,20 @@ import sys
 if sys.version_info[0] < 3:
     raise Exception('Python 3 or a more recent version is required.')
 
-IROHA_HOST_ADDR = os.getenv('IROHA_HOST_ADDR', 's1.tst2.iroha.tech')
+IROHA_HOST_ADDR = os.getenv('IROHA_HOST_ADDR', 'localhost')
 IROHA_PORT = os.getenv('IROHA_PORT', '50051')
 ADMIN_ACCOUNT_ID = os.getenv('ADMIN_ACCOUNT_ID', 'alice@test')
-ADMIN_PRIVATE_KEY = '0a230371f78507d9809a2ba1e349d98cd8022d94fc6f57857f8861c5794f7d39'
+ADMIN_PRIVATE_KEY = '51cec58ded55857ff908d4f205abe940aa5f20786753ec60ad56ed0db3d27048'
 ADMIN_PRIVATE_BIN = binascii.unhexlify(ADMIN_PRIVATE_KEY)
 iroha = Iroha(ADMIN_ACCOUNT_ID)
 net = IrohaGrpc('{}:{}'.format(IROHA_HOST_ADDR, IROHA_PORT))
 account_private_keys = [
-    'aa6369985c4decf7f81d2ff8d44663a3175e68bd35b9ee810bba6763ee4c562e53abb2f4c98a20379f74f1f3af055abf9d6f5d105d416af5a470007592a44718',
-    '7bab70e95cb585ea052c3aeb27de0afa9897ba5746276aa1c25310383216ceb860eb82baacbc940e710a40f21f962a3651013b90c23ece31606752f298c38d90'
+    'aa6369985c4decf7f81d2ff8d44663a3175e68bd35b9ee810bba6763ee4c562e',
+    '7bab70e95cb585ea052c3aeb27de0afa9897ba5746276aa1c25310383216ceb8'
 ]
 account_public_key = ['53abb2f4c98a20379f74f1f3af055abf9d6f5d105d416af5a470007592a44718',
                       '60eb82baacbc940e710a40f21f962a3651013b90c23ece31606752f298c38d90']
-account_name = 'mst_account4'
+account_name = 'mst_account'
 domain_id = 'test'
 account_with_domain = account_name+'@'+domain_id
 account_pk = ed25519_sha2.SigningKey(binascii.unhexlify(account_private_keys[0]))

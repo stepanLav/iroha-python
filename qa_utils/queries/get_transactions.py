@@ -11,12 +11,12 @@ if sys.version_info[0] < 3:
 
 
 IROHA_HOST_ADDR = os.getenv('IROHA_HOST_ADDR', 'localhost')
-IROHA_PORT = os.getenv('IROHA_PORT', '2345')
-ADMIN_ACCOUNT_ID = 'admin@root'
-ADMIN_PRIVATE_KEY = 'de9d622f92efe4a6e9a3926024b2a4543462233db0bfabcaf8eb6933e6c81466'
+IROHA_PORT = os.getenv('IROHA_PORT', '2346')
+ADMIN_ACCOUNT_ID = 'admin@nbc'
+ADMIN_PRIVATE_KEY = '72a9eb49c0cd469ed64f653e33ffc6dde475a6b9fd8be615086bce7c44b5a8f8'
 iroha = Iroha(ADMIN_ACCOUNT_ID)
 net = IrohaGrpc('{}:{}'.format(IROHA_HOST_ADDR, IROHA_PORT))
-txs = ['b2725674be478b64c3a59de529a19d7313f0de2d7ae8ca484e4d3462777d458d'.upper()]
+txs = ['e209af307d44ccef03f52538ab23c56d493e215bbc3d8593aeffe9beb5fa2ad7']
 
 def trace(func):
     """
