@@ -16,9 +16,9 @@ if sys.version_info[0] < 3:
 
 
 IROHA_HOST_ADDR = os.getenv('IROHA_HOST_ADDR', 'localhost')
-IROHA_PORT = os.getenv('IROHA_PORT', '2345')
-ADMIN_ACCOUNT_ID = 'admin@root'
-ADMIN_PRIVATE_KEY = 'de9d622f92efe4a6e9a3926024b2a4543462233db0bfabcaf8eb6933e6c81466'
+IROHA_PORT = os.getenv('IROHA_PORT', '5555')
+ADMIN_ACCOUNT_ID = 'root@root'
+ADMIN_PRIVATE_KEY = '7a1cb487ed17a60efbf4aa21df74bb391fcc2260f87c83eb7de9c120d2112ec7'
 iroha = Iroha(ADMIN_ACCOUNT_ID)
 net = IrohaGrpc('{}:{}'.format(IROHA_HOST_ADDR, IROHA_PORT))
 
@@ -54,7 +54,9 @@ def get_account_assets():
         query = iroha.query('GetAccountAssetTransactions', account_id=ADMIN_ACCOUNT_ID)
         IrohaCrypto.sign_query(query, ADMIN_PRIVATE_KEY)
 
-        response = net.send_blocks_stream_query(query)
+        response = net.send_query(query)
+        if response.error_response.message:
+            print(response.error_response.message)
         data = response.account_assets_response.account_assets
         for asset in data:
             print('Asset id = {}, balance = {}'.format(

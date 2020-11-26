@@ -3,15 +3,12 @@
 
 import os
 import binascii
-from time import sleep
 
 from iroha import IrohaCrypto
 from iroha import Iroha, IrohaGrpc
-from iroha.primitive_pb2 import can_set_my_account_detail
-import sys
 
 IROHA_HOST_ADDR = os.getenv('IROHA_HOST_ADDR', 'localhost')
-IROHA_PORT = os.getenv('IROHA_PORT', '50051')
+IROHA_PORT = os.getenv('IROHA_PORT', '5555')
 ADMIN_ACCOUNT_ID = 'root@root'
 ADMIN_PRIVATE_KEY = '7a1cb487ed17a60efbf4aa21df74bb391fcc2260f87c83eb7de9c120d2112ec7'
 iroha = Iroha(ADMIN_ACCOUNT_ID)
@@ -45,7 +42,7 @@ def add_asset_quantity():
 
     tx = iroha.transaction([
         iroha.command('AddAssetQuantity',
-                      asset_id='coin#test', amount='10000.00')
+                      asset_id='coin#test', amount='100')
     ])
 
     IrohaCrypto.sign_transaction(tx, ADMIN_PRIVATE_KEY)
@@ -53,6 +50,5 @@ def add_asset_quantity():
 
 i=0
 while i < 1:
-    add_asset_quantity()
-    sleep(0.5)
-    i+=1
+ add_asset_quantity()
+ i+=1

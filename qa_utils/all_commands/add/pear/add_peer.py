@@ -3,7 +3,6 @@
 
 import os
 import binascii
-from time import sleep
 
 from iroha import IrohaCrypto
 from iroha import Iroha, IrohaGrpc
@@ -16,8 +15,8 @@ if sys.version_info[0] < 3:
 
 IROHA_HOST_ADDR = os.getenv('IROHA_HOST_ADDR', '127.0.0.1')
 IROHA_PORT = os.getenv('IROHA_PORT', '50051')
-ADMIN_ACCOUNT_ID = 'admin@test'
-ADMIN_PRIVATE_KEY = 'f101537e319568c765b2cc89698325604991dca57b9716b58016b253506cab70'
+ADMIN_ACCOUNT_ID = 'root@root'
+ADMIN_PRIVATE_KEY = '7a1cb487ed17a60efbf4aa21df74bb391fcc2260f87c83eb7de9c120d2112ec7'
 iroha = Iroha(ADMIN_ACCOUNT_ID)
 net = IrohaGrpc('{}:{}'.format(IROHA_HOST_ADDR, IROHA_PORT))
 
@@ -49,11 +48,11 @@ def send_transaction_and_print_status(transaction):
 
 @trace
 def add_peer():
-    peer4 = primitive_pb2.Peer()
-    peer4.address = '127.0.0.1:10004'
-    peer4.peer_key = '4b66488f8d745930334efe15ed4879642cfd493bae302f7833d6564ba3edaea9'
+    peer1 = primitive_pb2.Peer()
+    peer1.address = '10.211.12.6:10002'
+    peer1.peer_key = '313a07e6384776ed95447710d15e59148473ccfc052a681317a72a69f2a49910'
     tx = iroha.transaction([
-        iroha.command('AddPeer', peer=peer4)
+        iroha.command('AddPeer', peer=peer1)
     ], creator_account=ADMIN_ACCOUNT_ID, quorum=1)
 
     IrohaCrypto.sign_transaction(tx, ADMIN_PRIVATE_KEY)

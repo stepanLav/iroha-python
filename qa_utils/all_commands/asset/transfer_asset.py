@@ -75,7 +75,7 @@ def get_account_assets():
                 asset.asset_id, asset.balance))
 
 i=0
-while i < 1:
+while i < 100:
     transfer_coin_from_admin_to_userone()
     get_account_assets()
     i += 1
